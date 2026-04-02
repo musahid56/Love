@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Gallery</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .card { background: #1e293b; border-radius: 15px; margin-bottom: 25px; border: 1px solid #334155; overflow: hidden; }
+        img, video { width: 100%; display: block; background: #000; }
+        .info { padding: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>MY GALLERY</h1>
+    <div class="container" id="main-gallery"></div>
+
+    <script>
+        async function loadFiles() {
+            const gallery = document.getElementById('main-gallery');
+            try {
+                const res = await fetch('data.json');
+                const data = await res.json();
+                
+                data.forEach(item => {
+                    let mediaHtml = '';
+                    if(item.type === 'image') {
+                        mediaHtml = `<img src="${item.file_name}">`;
+                    } else {
+                        mediaHtml = `<video controls><source src="${item.file_name}" type="video/mp4"></video>`;
+                    }
+                    
+                    gallery.innerHTML += `
+                        <div class="card">
+                            ${mediaHtml}
+                            <div class="info">${item.title}</div>
+                        </div>`;
+                });
+            } catch (e) { alert("Data load nahi hua!"); }
+        }
+        window.onload = loadFiles;
+    </script>
+</body>
+</html>
