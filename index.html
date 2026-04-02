@@ -3,44 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Gallery</title>
+    <title>My Gallery</title>
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; }
-        .card { background: #1e293b; border-radius: 15px; margin-bottom: 25px; border: 1px solid #334155; overflow: hidden; }
-        img, video { width: 100%; display: block; background: #000; }
+        .card { background: #1e293b; border-radius: 15px; margin: 20px auto; overflow: hidden; border: 1px solid #334155; max-width: 400px; }
+        img { width: 100%; display: block; height: auto; background: #000; }
         .info { padding: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <h1>MY GALLERY</h1>
-    <div class="container" id="main-gallery"></div>
+    <div id="gallery"></div>
 
     <script>
-        async function loadFiles() {
-            const gallery = document.getElementById('main-gallery');
+        async function loadGallery() {
+            const gallery = document.getElementById('gallery');
             try {
-                const res = await fetch('data.json');
+                // Cash clear karne ke liye ek random number joda hai
+                const res = await fetch('data.json?v=' + Math.random());
                 const data = await res.json();
                 
+                gallery.innerHTML = ''; 
                 data.forEach(item => {
-                    let mediaHtml = '';
-                    if(item.type === 'image') {
-                        mediaHtml = `<img src="${item.file_name}">`;
-                    } else {
-                        mediaHtml = `<video controls><source src="${item.file_name}" type="video/mp4"></video>`;
-                    }
-                    
                     gallery.innerHTML += `
                         <div class="card">
-                            ${mediaHtml}
+                            <img src="${item.file_name}" alt="Photo">
                             <div class="info">${item.title}</div>
                         </div>`;
                 });
-            } catch (e) { alert("Data load nahi hua!"); }
+            } catch (e) {
+                console.error("Error:", e);
+            }
         }
-        window.onload = loadFiles;
+        window.onload = loadGallery;
     </script>
 </body>
 </html>
