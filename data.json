@@ -2,11 +2,6 @@
   {
     "type": "image",
     "title": "Meri Pehli Photo",
-    "file_name": "myphoto.jpg"
-  },
-  {
-    "type": "video",
-    "title": "Mera Pehla Video",
-    "file_name": "myvideo.mp4"
+    "file_name": "Image.jpg"
   }
 ]
