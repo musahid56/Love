@@ -3,84 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Gallery</title>
+    <title>Pro Gallery - Jaano Zara</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; }
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #3b82f6; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         
-        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        h1 { margin-bottom: 30px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        body { background: var(--bg); color: white; padding: 15px; }
+        h1 { text-align: center; margin-bottom: 20px; color: var(--primary); }
 
-        .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
-        
-        /* Card Design */
-        .card { 
-            background: var(--card); 
-            border-radius: 15px; 
-            overflow: hidden; 
-            border: 1px solid #334155; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            transition: 0.3s;
+        /* Grid System (Sab photos ek saath) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            max-width: 800px;
+            margin: auto;
         }
 
-        /* Agar photo nahi mili toh card ko gayab karne ke liye ye class use hogi */
-        .hidden { display: none; }
+        .thumb-card {
+            background: var(--card);
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid #334155;
+        }
 
-        img, video { width: 100%; display: block; background: #000; min-height: 100px; }
+        .thumb-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Full Screen Overlay (Lightbox) */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #full-img { max-width: 95%; max-height: 70%; border-radius: 10px; transition: 0.3s; }
+
+        .controls { width: 100%; display: flex; justify-content: space-between; position: absolute; padding: 0 20px; top: 50%; }
         
-        .info { padding: 15px; text-align: center; font-weight: bold; font-size: 16px; border-top: 1px solid #334155; }
+        .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 30px; padding: 10px; border-radius: 50%; cursor: pointer; }
+
+        .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 15px; }
+
+        .btn-action { background: var(--primary); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; cursor: pointer; border: none; }
+        
+        .close-btn { background: #ef4444; }
+
+        #img-title { margin-top: 20px; font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>My Gallery</h1>
+    <h1>MY PRO GALLERY</h1>
 
-    <div class="container" id="gallery">
+    <div class="grid-container" id="grid">
         </div>
 
+    <div id="overlay">
+        <div class="top-bar">
+            <a id="download-link" href="#" download class="btn-action">Download</a>
+            <button class="btn-action close-btn" onclick="closeImg()">X</button>
+        </div>
+
+        <img id="full-img" src="" alt="Full View">
+        <div id="img-title"></div>
+
+        <div class="controls">
+            <button class="nav-btn" onclick="prevImg()">❮</button>
+            <button class="nav-btn" onclick="nextImg()">❯</button>
+        </div>
+    </div>
+
     <script>
-        async function loadGallery() {
-            const gallery = document.getElementById('gallery');
+        let allItems = [];
+        let currentIndex = 0;
+
+        async function loadProGallery() {
+            const grid = document.getElementById('grid');
             try {
-                // data.json se list mangwao (Cache clear karne ke liye Date.now joda hai)
                 const res = await fetch('data.json?v=' + Date.now());
-                const data = await res.json();
+                allItems = await res.json();
                 
-                gallery.innerHTML = ''; // Pehle purana kachra saaf karo
-
-                data.forEach(item => {
-                    // Ek naya dabba (Card) banao
-                    const card = document.createElement('div');
-                    card.className = 'card';
-
-                    let mediaHtml = '';
-                    
-                    if (item.type === 'image') {
-                        // Agar image nahi mili (onerror), toh poore card ko hide kar do
-                        mediaHtml = `<img src="${item.file_name}" onerror="this.closest('.card').style.display='none'">`;
-                    } else {
-                        // Agar video nahi mila, toh poore card ko hide kar do
-                        mediaHtml = `
-                            <video controls onerror="this.closest('.card').style.display='none'">
-                                <source src="${item.file_name}" type="video/mp4">
-                            </video>`;
-                    }
-
-                    card.innerHTML = `
-                        ${mediaHtml}
-                        <div class="info">${item.title}</div>
-                    `;
-
-                    gallery.appendChild(card);
+                grid.innerHTML = '';
+                allItems.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'thumb-card';
+                    div.innerHTML = `<img src="${item.file_name}" onerror="this.parentElement.style.display='none'">`;
+                    div.onclick = () => openImg(index);
+                    grid.appendChild(div);
                 });
-            } catch (error) {
-                console.log("JSON file load nahi ho rahi!");
-            }
+            } catch (e) { console.log("JSON Load Fail!"); }
         }
 
-        // Page load hote hi function chalao
-        window.onload = loadGallery;
+        function openImg(index) {
+            currentIndex = index;
+            const item = allItems[index];
+            document.getElementById('full-img').src = item.file_name;
+            document.getElementById('download-link').href = item.file_name;
+            document.getElementById('img-title').innerText = item.title;
+            document.getElementById('overlay').style.display = 'flex';
+        }
+
+        function closeImg() { document.getElementById('overlay').style.display = 'none'; }
+
+        function nextImg() {
+            currentIndex = (currentIndex + 1) % allItems.length;
+            openImg(currentIndex);
+        }
+
+        function prevImg() {
+            currentIndex = (currentIndex - 1 + allItems.length) % allItems.length;
+            openImg(currentIndex);
+        }
+
+        // Swipe ya keyboard control (Optional)
+        window.onload = loadProGallery;
     </script>
 </body>
 </html>
