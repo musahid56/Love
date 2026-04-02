@@ -3,39 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gallery</title>
+    <title>My Personal Gallery</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #1e293b; border-radius: 15px; margin: 20px auto; overflow: hidden; border: 1px solid #334155; max-width: 400px; }
-        img { width: 100%; display: block; height: auto; background: #000; }
-        .info { padding: 15px; font-weight: bold; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        
+        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        h1 { margin-bottom: 30px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+
+        .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Card Design */
+        .card { 
+            background: var(--card); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            border: 1px solid #334155; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+
+        /* Agar photo nahi mili toh card ko gayab karne ke liye ye class use hogi */
+        .hidden { display: none; }
+
+        img, video { width: 100%; display: block; background: #000; min-height: 100px; }
+        
+        .info { padding: 15px; text-align: center; font-weight: bold; font-size: 16px; border-top: 1px solid #334155; }
     </style>
 </head>
 <body>
 
-    <h1>MY GALLERY</h1>
-    <div id="gallery"></div>
+    <h1>My Gallery</h1>
+
+    <div class="container" id="gallery">
+        </div>
 
     <script>
         async function loadGallery() {
             const gallery = document.getElementById('gallery');
             try {
-                // Cash clear karne ke liye ek random number joda hai
-                const res = await fetch('data.json?v=' + Math.random());
+                // data.json se list mangwao (Cache clear karne ke liye Date.now joda hai)
+                const res = await fetch('data.json?v=' + Date.now());
                 const data = await res.json();
                 
-                gallery.innerHTML = ''; 
+                gallery.innerHTML = ''; // Pehle purana kachra saaf karo
+
                 data.forEach(item => {
-                    gallery.innerHTML += `
-                        <div class="card">
-                            <img src="${item.file_name}" alt="Photo">
-                            <div class="info">${item.title}</div>
-                        </div>`;
+                    // Ek naya dabba (Card) banao
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    let mediaHtml = '';
+                    
+                    if (item.type === 'image') {
+                        // Agar image nahi mili (onerror), toh poore card ko hide kar do
+                        mediaHtml = `<img src="${item.file_name}" onerror="this.closest('.card').style.display='none'">`;
+                    } else {
+                        // Agar video nahi mila, toh poore card ko hide kar do
+                        mediaHtml = `
+                            <video controls onerror="this.closest('.card').style.display='none'">
+                                <source src="${item.file_name}" type="video/mp4">
+                            </video>`;
+                    }
+
+                    card.innerHTML = `
+                        ${mediaHtml}
+                        <div class="info">${item.title}</div>
+                    `;
+
+                    gallery.appendChild(card);
                 });
-            } catch (e) {
-                console.error("Error:", e);
+            } catch (error) {
+                console.log("JSON file load nahi ho rahi!");
             }
         }
+
+        // Page load hote hi function chalao
         window.onload = loadGallery;
     </script>
 </body>
