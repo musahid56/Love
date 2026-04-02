@@ -1,7 +1,53 @@
 [
   {
     "type": "image",
-    "title": "Meri Pehli Photo",
-    "file_name": "Image.jpg"
+    "title": "Photo Number 1",
+    "file_name": "photo1.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 2",
+    "file_name": "photo2.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 3",
+    "file_name": "photo3.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 4",
+    "file_name": "photo4.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 5",
+    "file_name": "photo5.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 6",
+    "file_name": "photo6.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 7",
+    "file_name": "photo7.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 8",
+    "file_name": "photo8.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 9",
+    "file_name": "photo9.jpg"
+  },
+  {
+    "type": "image",
+    "title": "Photo Number 10",
+    "file_name": "photo10.jpg"
   }
 ]
+
